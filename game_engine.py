@@ -1,6 +1,7 @@
 import pygame
 import time
 from player import CirclePellet, CirclePlayer
+from ai_player import AiCirclePlayer, AiCirclePlayerEngine
 import numpy as np
 
 pygame.init()
@@ -8,11 +9,11 @@ pygame.init()
 class Engine:
     def __init__(self):
         self.user: CirclePlayer = CirclePlayer()
-        self.players: list[CirclePlayer] = []
-        self.resolution = (1400, 1400)
+        self.players: list[AiCirclePlayer] = [AiCirclePlayer(AiCirclePlayerEngine())]
+        self.resolution = (1400, 1000)
         self.screen = pygame.display.set_mode(self.resolution)
 
-        self.scaling_factor = 3.0
+        self.scaling_factor = 2.0
 
         self.pellets: list[CirclePellet] = []
 
@@ -32,6 +33,13 @@ class Engine:
             radius=player.get_size()
 
             pygame.draw.circle(surface, color, center, radius, width=0)
+
+            text_surface = font.render(str(player.get_formatted_size()), True, (0, 0, 0))
+    
+            text_rect = text_surface.get_rect()
+            text_rect.center = player.get_location()
+
+            surface.blit(text_surface, text_rect)
 
     def draw_circle_pellets(self, surface):
         for pellet in self.pellets:
@@ -77,10 +85,26 @@ class Engine:
             print("Failed to update user location")
 
     def update_non_user_circle_pos(self):
-        pass
+        for player in self.players:
+            cursor_position = np.array(player.get_mouse_position())
+            player_location = player.get_location()
+
+            direction_vector = cursor_position - player_location
+            direction_magnitude = np.linalg.norm(direction_vector)
+
+            if direction_magnitude > 0:
+                normalized_direction_vector = direction_vector / direction_magnitude
+
+                updated_location = player.get_location() + normalized_direction_vector * self.scaling_factor
+
+                player.update_location(updated_location)
+            else:
+                print("Failed to update user location")
 
     def update_circle_sizes(self):
         self.user.increment_size()
+        for player in self.players:
+            player.increment_size()
 
     def handle_user_shoot(self, cursor_position):
         direction_vector = self.get_direction_vector(cursor_position)
@@ -90,6 +114,9 @@ class Engine:
         pellet = self.user.shoot(normalized_direction_vector)
         if pellet:
             self.pellets.append(pellet)
+
+    def handle_non_user_circle_shoot(self):
+        pass
 
     def run_game(self):
         running = True
@@ -109,6 +136,9 @@ class Engine:
                         running = False
 
             self.update_user_circle_pos(pygame.mouse.get_pos())
+            self.update_non_user_circle_pos() 
+
+            self.handle_non_user_circle_shoot()
             self.update_circle_sizes()
 
             self.step_pellet_locations()
