@@ -1,21 +1,27 @@
 import pygame
 import time
 from player import CirclePellet, CirclePlayer
-from ai_player import AiCirclePlayer, AiCirclePlayerEngine
+from ai_player import AiCirclePlayer, AiCirclePlayerEngine, SmartAiCirclePlayerEngine
 import numpy as np
+
+from broadcaster import Broadcaster, PlayerInfo
 
 pygame.init()
 
 class Engine:
     def __init__(self):
+        self.broadcaster: Broadcaster = Broadcaster()
+
         self.user: CirclePlayer = CirclePlayer()
-        self.players: list[AiCirclePlayer] = [AiCirclePlayer(AiCirclePlayerEngine())]
+        self.players: list[AiCirclePlayer] = [AiCirclePlayer(SmartAiCirclePlayerEngine(self.broadcaster))]
         self.resolution = (1400, 1000)
         self.screen = pygame.display.set_mode(self.resolution)
 
         self.scaling_factor = 2.0
 
         self.pellets: list[CirclePellet] = []
+
+        
 
     def draw_circles(self, surface):
         pygame.draw.circle(surface, self.user.get_color(), self.user.get_location(), self.user.get_size(), width=0)
@@ -116,7 +122,27 @@ class Engine:
             self.pellets.append(pellet)
 
     def handle_non_user_circle_shoot(self):
-        pass
+        for player in self.players:
+
+            pellet = player.shoot()
+            if pellet:
+                self.pellets.append(pellet)
+
+    def broadcast_info(self):
+        user_info = PlayerInfo()
+        user_info.location = self.user.get_location()
+        user_info.is_human = True
+        user_info.player_id = 0
+
+        self.broadcaster.publish_info(user_info)
+
+        for player_id, player in enumerate(self.players):
+            player_info = PlayerInfo()
+            player_info.location = player.get_location()
+            player_info.is_human = False
+            player_info.player_id = player_id + 1 # TODO: Fix this CirclePlayer should also know Id
+
+            self.broadcaster.publish_info(player_info)
 
     def run_game(self):
         running = True
@@ -142,6 +168,8 @@ class Engine:
             self.update_circle_sizes()
 
             self.step_pellet_locations()
+
+            self.broadcast_info()
 
             print(f"Number of Pellets in Game: {len(self.pellets)}", end="\r")
 
