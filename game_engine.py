@@ -8,6 +8,7 @@ from broadcaster import Broadcaster, PlayerInfo
 
 pygame.init()
 
+
 class Engine:
     def __init__(self):
         self.broadcaster: Broadcaster = Broadcaster()
@@ -20,8 +21,6 @@ class Engine:
         self.scaling_factor = 2.0
 
         self.pellets: list[CirclePellet] = []
-
-        
 
     def draw_circles(self, surface):
         pygame.draw.circle(surface, self.user.get_color(), self.user.get_location(), self.user.get_size(), width=0)
@@ -101,7 +100,7 @@ class Engine:
             if direction_magnitude > 0:
                 normalized_direction_vector = direction_vector / direction_magnitude
 
-                updated_location = player.get_location() + normalized_direction_vector * self.scaling_factor
+                updated_location = player.get_location() + normalized_direction_vector * 1.0 #self.scaling_factor
 
                 player.update_location(updated_location)
             else:
@@ -144,6 +143,25 @@ class Engine:
 
             self.broadcaster.publish_info(player_info)
 
+    def _should_delete_pellet(self, pellet: CirclePellet):
+        x, y = pellet.get_location()
+
+        if x >= 0 and x < self.resolution[0] and y >= 0 and y < self.resolution[1]:
+            return False
+
+        return True
+
+    def despawn_pellets(self):
+        idx = len(self.pellets) - 1 
+
+        while idx >= 0:
+            pellet = self.pellets[idx]
+
+            if self._should_delete_pellet(pellet):
+                self.pellets.pop(idx)
+
+            idx -= 1
+
     def run_game(self):
         running = True
         while running:
@@ -170,6 +188,9 @@ class Engine:
             self.step_pellet_locations()
 
             self.broadcast_info()
+            self.despawn_pellets()
+
+            self.pellet_players_collision_check()
 
             print(f"Number of Pellets in Game: {len(self.pellets)}", end="\r")
 
