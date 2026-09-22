@@ -162,6 +162,57 @@ class Engine:
 
             idx -= 1
 
+    def pellet_players_collision_check(self):
+        pellet_locations = []
+        for pellet in self.pellets:
+            x, y = pellet.get_location()
+            pellet_locations.append((x, y, pellet.get_size()))
+
+        player_locations = []
+        for player in self.players:
+            x, y = player.get_location()
+            player_locations.append((x, y, player.get_size()))
+
+        x, y = self.user.get_location()
+        player_locations.append((x, y, self.user.get_size()))
+
+        if not pellet_locations or not player_locations:
+            return
+
+        pellet_locations = np.array(pellet_locations).reshape(-1, 3)
+        player_locations = np.array(player_locations).reshape(-1, 3)
+
+        # print(player_locations.shape, pellet_locations.shape)
+
+        distance_mat = np.sqrt(np.sum(player_locations[:, :2]**2, axis=1, keepdims=True) + np.sum(pellet_locations[:, :2]**2, axis=1, keepdims=True).T + (-2 * (player_locations[:, :2] @ pellet_locations[:, :2].T)))
+
+        player_radii = player_locations[:, 2:]
+        pellet_radii = pellet_locations[:, 2:]
+
+        thresholds = player_radii.reshape(-1, 1) + pellet_radii.reshape(1, -1)
+
+        collision_mat = distance_mat < thresholds
+
+        penalty_per_player = np.sum(collision_mat, axis=1)
+
+        for i, player in enumerate(self.players):
+            for _ in range(penalty_per_player[i]):
+                player.got_shot()
+
+        for _ in range(penalty_per_player[-1]):
+            self.user.got_shot()
+
+        pellets_to_remove = np.sum(collision_mat, axis=0) > 0
+
+
+        # Remove Pellets which hit a player
+        for i in reversed(range(len(pellets_to_remove))):
+            if pellets_to_remove[i]:
+                self.pellets.pop(i)
+
+        # print(penalty_per_player)
+    
+
     def run_game(self):
         running = True
         while running:

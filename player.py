@@ -28,6 +28,9 @@ class CirclePlayer():
     def increment_size(self):
         self.size += 0.01
 
+    def got_shot(self):
+        self.size -= 10
+
     def shoot(self, direction):
         if self.size < self.min_size:
             return None
