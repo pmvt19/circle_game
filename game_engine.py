@@ -182,8 +182,6 @@ class Engine:
         pellet_locations = np.array(pellet_locations).reshape(-1, 3)
         player_locations = np.array(player_locations).reshape(-1, 3)
 
-        # print(player_locations.shape, pellet_locations.shape)
-
         distance_mat = np.sqrt(np.sum(player_locations[:, :2]**2, axis=1, keepdims=True) + np.sum(pellet_locations[:, :2]**2, axis=1, keepdims=True).T + (-2 * (player_locations[:, :2] @ pellet_locations[:, :2].T)))
 
         player_radii = player_locations[:, 2:]
@@ -202,14 +200,10 @@ class Engine:
 
         pellets_to_remove = np.sum(collision_mat, axis=0) > 0
 
-
         # Remove Pellets which hit a player
         for i in reversed(range(len(pellets_to_remove))):
             if pellets_to_remove[i]:
-                self.pellets.pop(i)
-
-        # print(penalty_per_player)
-    
+                self.pellets.pop(i)    
 
     def run_game(self):
         running = True
