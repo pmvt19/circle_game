@@ -100,7 +100,7 @@ class Engine:
             if direction_magnitude > 0:
                 normalized_direction_vector = direction_vector / direction_magnitude
 
-                updated_location = player.get_location() + normalized_direction_vector * 1.0 #self.scaling_factor
+                updated_location = player.get_location() + normalized_direction_vector * 0.1 #self.scaling_factor
 
                 player.update_location(updated_location)
             else:
@@ -150,6 +150,9 @@ class Engine:
             return False
 
         return True
+
+    def _should_delete_player(self, player: CirclePlayer):
+        return player.get_size() <= 0
 
     def despawn_pellets(self):
         idx = len(self.pellets) - 1 
@@ -203,7 +206,22 @@ class Engine:
         # Remove Pellets which hit a player
         for i in reversed(range(len(pellets_to_remove))):
             if pellets_to_remove[i]:
-                self.pellets.pop(i)    
+                self.pellets.pop(i)
+
+    def despawn_players(self):
+        idx = len(self.players) - 1 
+        
+        while idx >= 0:
+            player = self.players[idx]
+
+            if self._should_delete_player(player):
+                self.players.pop(idx)
+
+            idx -= 1
+
+
+        # TODO: Handle User Getting Out
+        
 
     def run_game(self):
         running = True
@@ -234,6 +252,8 @@ class Engine:
             self.despawn_pellets()
 
             self.pellet_players_collision_check()
+
+            self.despawn_players()
 
             print(f"Number of Pellets in Game: {len(self.pellets)}", end="\r")
 
