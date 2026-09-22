@@ -100,7 +100,7 @@ class Engine:
             if direction_magnitude > 0:
                 normalized_direction_vector = direction_vector / direction_magnitude
 
-                updated_location = player.get_location() + normalized_direction_vector * 0.1 #self.scaling_factor
+                updated_location = player.get_location() + normalized_direction_vector * self.scaling_factor
 
                 player.update_location(updated_location)
             else:
@@ -219,10 +219,14 @@ class Engine:
 
             idx -= 1
 
-
-        # TODO: Handle User Getting Out
+        if self._should_delete_player(self.user):
+            return True
         
+        return False
 
+    def draw_gameover_screen(self):
+        pass
+        
     def run_game(self):
         running = True
         while running:
@@ -253,9 +257,11 @@ class Engine:
 
             self.pellet_players_collision_check()
 
-            self.despawn_players()
+            if self.despawn_players():
+                running = False
 
             print(f"Number of Pellets in Game: {len(self.pellets)}", end="\r")
+        self.draw_gameover_screen()
 
 engine = Engine()
 engine.run_game()
