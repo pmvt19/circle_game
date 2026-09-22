@@ -97,13 +97,13 @@ class AiCirclePlayer(CirclePlayer):
 
 
     def shoot(self, direction=None):
-        if self.ai_engine.should_shoot():
+        if self.can_shoot() and self.ai_engine.should_shoot():
             if self.size < self.min_size:
                 return None
             self.size -= 5
             direction = np.array(self.ai_engine.get_mouse_position_for_shooting()) - self.location
             direction_magnitude = np.linalg.norm(direction)
             direction = direction / direction_magnitude
-
+            self.time_since_last_shot = time.time()
             return CirclePellet(self, direction)
         return None
