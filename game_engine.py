@@ -224,8 +224,14 @@ class Engine:
         
         return False
 
-    def draw_gameover_screen(self):
-        pass
+    def draw_gameover_screen(self, surface):
+        font = pygame.font.Font(None, 50)
+        text_surface = font.render("Game Over", True, (0, 0, 0))
+
+        text_rect = text_surface.get_rect()
+        text_rect.center = (self.resolution[0]/2, self.resolution[1]/2)
+
+        surface.blit(text_surface, text_rect)
         
     def run_game(self):
         running = True
@@ -261,7 +267,14 @@ class Engine:
                 running = False
 
             print(f"Number of Pellets in Game: {len(self.pellets)}", end="\r")
-        self.draw_gameover_screen()
+
+        # TODO: Fix the game over screen
+        surface = pygame.Surface(self.resolution)
+        surface.fill((255, 255, 255))
+        self.draw_gameover_screen(surface)
+        self.screen.blit(surface, (0,0))
+        pygame.display.flip()
+        time.sleep(100)
 
 engine = Engine()
 engine.run_game()
