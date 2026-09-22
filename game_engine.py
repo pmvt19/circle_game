@@ -196,11 +196,9 @@ class Engine:
         penalty_per_player = np.sum(collision_mat, axis=1)
 
         for i, player in enumerate(self.players):
-            for _ in range(penalty_per_player[i]):
-                player.got_shot()
+            player.got_shot(penalty_per_player[i])
 
-        for _ in range(penalty_per_player[-1]):
-            self.user.got_shot()
+        self.user.got_shot(penalty_per_player[-1])
 
         pellets_to_remove = np.sum(collision_mat, axis=0) > 0
 
