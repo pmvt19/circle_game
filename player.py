@@ -9,7 +9,7 @@ class CirclePlayer():
 
         self.min_size = 20
 
-        self.shot_cooldown = 1
+        self.shot_cooldown = 0.5
         self.time_since_last_shot = time.time()
 
     def get_location(self):
