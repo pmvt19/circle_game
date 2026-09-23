@@ -236,6 +236,7 @@ class Engine:
     def run_game(self):
         running = True
         while running:
+            start_time = time.time()
             surface = pygame.Surface(self.resolution)
             surface.fill((255, 255, 255))
             self.draw_game_frame(surface)
@@ -266,7 +267,11 @@ class Engine:
             if self.despawn_players():
                 running = False
 
-            print(f"Number of Pellets in Game: {len(self.pellets)}", end="\r")
+            end_time = time.time()
+
+            print(f"FPS: {1 / (end_time - start_time)}", end="\r")
+
+            # print(f"Number of Pellets in Game: {len(self.pellets)}", end="\r")
 
         # TODO: Fix the game over screen
         surface = pygame.Surface(self.resolution)
