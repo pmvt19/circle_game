@@ -3,7 +3,8 @@ import time
 import pygame
 
 class CirclePlayer():
-    def __init__(self, location=(0, 0), color=(0,0,255)):
+    def __init__(self, id=0, location=(0, 0), color=(0,0,255)):
+        self.player_id = id
         self.size = 50
         self.location = np.array(location)
         self.color = color
