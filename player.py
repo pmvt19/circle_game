@@ -95,7 +95,100 @@ class CirclePellet():
     def step_location(self):
         self.location += self.direction_vector * self.speed
 
+# TBD
 
+class ReadOnlyCirclePlayer(CirclePlayer):
+    def __init__(self, size: int, location: tuple[int, int], color: tuple[int, int, int]):
+        self.size = size
+        self.location = np.array(location)
+        self.color = color
+
+    def get_location(self):
+        return self.location
+
+    def get_size(self):
+        return self.size
+
+    def get_formatted_size(self):
+        return f"{int(self.size)}"
+
+    def get_color(self):
+        return self.color
+
+    def get_mouse_position(self):
+        raise NotImplementedError
+
+    def update_state(self):
+        pass
+    
+    def update_location(self, location):
+        raise NotImplementedError
+
+    def increment_size(self):
+        raise NotImplementedError
+
+    def got_shot(self, magnitude):
+        raise NotImplementedError
+
+    def get_direction_vector(self, cursor_position):
+        return NotImplementedError
+
+    def can_shoot(self):
+        return NotImplementedError
+
+    def should_shoot(self):
+        return NotImplementedError
+
+    def shoot(self, direction=None):
+        return NotImplementedError
+
+
+class WriteCirclePlayer(CirclePlayer):
+    def __init__(self, size: int, location: tuple[int, int], color: tuple[int, int, int]):
+        self.size = size
+        self.location = np.array(location)
+        self.color = color
+
+    def get_location(self):
+        return self.location
+
+    def get_size(self):
+        return self.size
+
+    def get_formatted_size(self):
+        return f"{int(self.size)}"
+
+    def get_color(self):
+        return self.color
+
+    def get_mouse_position(self):
+        raise NotImplementedError
+    
+    def update_location(self, location):
+        raise NotImplementedError
+
+    def increment_size(self):
+        raise NotImplementedError
+
+    def got_shot(self, magnitude):
+        raise NotImplementedError
+
+    def get_direction_vector(self, cursor_position):
+        return NotImplementedError
+
+    def can_shoot(self):
+        return NotImplementedError
+
+    def should_shoot(self):
+        return NotImplementedError
+
+    def shoot(self, direction=None):
+        return NotImplementedError
+
+
+
+    
+    
 # Ideas for AI:
 
 # Shoot in the direction of the user circle
