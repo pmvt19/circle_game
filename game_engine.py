@@ -13,6 +13,7 @@ class Engine:
     def __init__(self):
         self.broadcaster: Broadcaster = Broadcaster()
 
+        # TODO: Should User always be in players?
         self.user: CirclePlayer = CirclePlayer()
         self.players: list[AiCirclePlayer] = [AiCirclePlayer(SmartAiCirclePlayerEngine(self.broadcaster))]
         self.resolution = (1400, 1000)
@@ -280,6 +281,54 @@ class Engine:
         self.screen.blit(surface, (0,0))
         pygame.display.flip()
         time.sleep(100)
+
+    # def run_game_headless(self):
+    #     running = True
+    #     while running:
+    #         start_time = time.time()
+    #         # surface = pygame.Surface(self.resolution)
+    #         # surface.fill((255, 255, 255))
+    #         # self.draw_game_frame(surface)
+
+    #         pygame.display.flip()
+    #         for event in pygame.event.get():
+    #             if event.type == pygame.KEYDOWN:
+    #                 if event.key == pygame.K_SPACE:
+    #                     self.handle_user_shoot(pygame.mouse.get_pos())
+
+    #                 # Stop Game If User Presses "q"
+    #                 if event.key == pygame.K_q:
+    #                     running = False
+
+    #         self.update_user_circle_pos(pygame.mouse.get_pos())
+    #         self.update_non_user_circle_pos() 
+
+    #         self.handle_non_user_circle_shoot()
+    #         self.update_circle_sizes()
+
+    #         self.step_pellet_locations()
+
+    #         self.broadcast_info()
+    #         self.despawn_pellets()
+
+    #         self.pellet_players_collision_check()
+
+    #         if self.despawn_players():
+    #             running = False
+
+    #         end_time = time.time()
+
+    #         print(f"FPS: {1 / (end_time - start_time)}", end="\r")
+
+    #         # print(f"Number of Pellets in Game: {len(self.pellets)}", end="\r")
+
+    #     # TODO: Fix the game over screen
+    #     surface = pygame.Surface(self.resolution)
+    #     surface.fill((255, 255, 255))
+    #     self.draw_gameover_screen(surface)
+    #     self.screen.blit(surface, (0,0))
+    #     pygame.display.flip()
+    #     time.sleep(100)
 
 engine = Engine()
 engine.run_game()
