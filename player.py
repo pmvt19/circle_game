@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import pygame
 
 class CirclePlayer():
     def __init__(self, location=(0, 0), color=(0,0,255)):
@@ -35,14 +36,37 @@ class CirclePlayer():
     def got_shot(self, magnitude):
         self.size -= 10 * magnitude
 
-    def can_shoot(self):
-        return time.time() - self.time_since_last_shot > self.shot_cooldown
+    def get_direction_vector(self, cursor_position):
+        # TODO: Ensure no divide by Zero
+        direction = cursor_position - self.location
+        direction_magnitude = np.linalg.norm(direction)
+        direction = direction / direction_magnitude
+        return direction
 
-    def shoot(self, direction):
-        if not self.can_shoot() or self.size < self.min_size:
+    def can_shoot(self):
+        return time.time() - self.time_since_last_shot > self.shot_cooldown and self.size >= self.min_size
+
+    def should_shoot(self):
+        keys = pygame.key.get_pressed()
+        return keys[pygame.K_SPACE]
+
+    def get_mouse_position(self):
+        pygame.event.get() # Update Mouse Positions
+        return np.array(pygame.mouse.get_pos())
+
+    def shoot(self, direction=None):
+        # TODO: Clean this logic up
+        if direction is None:
+            print("Not shooting no direction")
+            return None
+        if not self.can_shoot():
+            return None
+
+        if not self.should_shoot():
             return None
         self.size -= 5
         self.time_since_last_shot = time.time()
+        direction = self.get_direction_vector(direction)
         return CirclePellet(self, direction)
 
 class CirclePellet():
